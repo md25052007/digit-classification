@@ -1,0 +1,1046 @@
+
+--- PAGE 0 ---
+MAT 167: Applied Linear Algebra
+Lecture 21: Classiﬁcation of Handwritten Digits
+Naoki Saito
+Department of Mathematics
+University of California, Davis
+May 17, 2017
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 1 / 24
+--- PAGE 1 ---
+Outline
+1The USPS Handwritten Digits Dataset
+2Simple Classiﬁcation Algorithms
+3Classiﬁcation Using SVD Bases
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 2 / 24
+--- PAGE 2 ---
+The USPS Handwritten Digits Dataset
+Outline
+1The USPS Handwritten Digits Dataset
+2Simple Classiﬁcation Algorithms
+3Classiﬁcation Using SVD Bases
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 3 / 24
+--- PAGE 3 ---
+The USPS Handwritten Digits Dataset
+The USPS Handwritten Digit Dataset
+The USPS digits data were gathered at the Center of Excellence in
+Document Analysis and Recognition (CEDAR) at SUNY Buﬀalo, as
+part of a project sponsored by the US Postal Service.
+The dataset is described in the following paper: J. J. Hull: “A
+database for handwritten text recognition research,” IEEE
+Transactions on Pattern Analysis and Machine Intelligence , vol. 16,
+no. 5, pp. 550–554, 1994.
+Figure: First 16 digit images from the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 4 / 24
+--- PAGE 4 ---
+The USPS Handwritten Digits Dataset
+The USPS Handwritten Digit Dataset
+The USPS digits data were gathered at the Center of Excellence in
+Document Analysis and Recognition (CEDAR) at SUNY Buﬀalo, as
+part of a project sponsored by the US Postal Service.
+The dataset is described in the following paper: J. J. Hull: “A
+database for handwritten text recognition research,” IEEE
+Transactions on Pattern Analysis and Machine Intelligence , vol. 16,
+no. 5, pp. 550–554, 1994.
+Figure: First 16 digit images from the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 4 / 24
+--- PAGE 5 ---
+The USPS Handwritten Digits Dataset
+The USPS Handwritten Digit Dataset
+The USPS digits data were gathered at the Center of Excellence in
+Document Analysis and Recognition (CEDAR) at SUNY Buﬀalo, as
+part of a project sponsored by the US Postal Service.
+The dataset is described in the following paper: J. J. Hull: “A
+database for handwritten text recognition research,” IEEE
+Transactions on Pattern Analysis and Machine Intelligence , vol. 16,
+no. 5, pp. 550–554, 1994.
+Figure: First 16 digit images from the training dataset.saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 4 / 24
+--- PAGE 6 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 7 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 8 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 9 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 10 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 11 ---
+The USPS Handwritten Digits Dataset
+This dataset is available from
+http://www.gaussianprocess.org/gpml/data/ .
+There are totally 9298 handwritten single digits between 0 and 9, each
+of which consists of 16 £16 pixel image.
+Half of 9298 digits are designated as trainingand the other half are as
+test: use 4649 digits for constructing a classiﬁcation algorithm, and
+use the other 4649 digits to test the performance of that algorithm.
+Pixel values are normalized to be in the range of [-1, 1].
+Each digit image is represented as a 1D vector of length 256 in the
+MATLAB ﬁle, so there are two matrices in the ﬁle called
+train_patterns andtest_patterns each of which is of size
+256£4649.
+Note that if you want to see a digit of a particular column of these
+matrices using MATLAB like in the ﬁgure of the previous page, you
+need to reshape that column (a vector of length 256) to a small
+matrix of size 16 £16 and then transpose it before rendering it using
+imagesc function.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 5 / 24
+--- PAGE 12 ---
+The USPS Handwritten Digits Dataset
+The labels are also known for both training and test sets. They are
+stored in train_labels andtest_labels each of which is of size
+10£4649.
+LetA2R10£4649be one of these label matrices. Then A(:,j), i.e., jth
+column of Adescribes the label of the jth digit in the following way. If
+that digit represents digit i(0·i·9), then A(iÅ1,j)Æ Å1 and
+A(l,j)Æ ¡1 for l6ÆiÅ1.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 6 / 24
+--- PAGE 13 ---
+The USPS Handwritten Digits Dataset
+The labels are also known for both training and test sets. They are
+stored in train_labels andtest_labels each of which is of size
+10£4649.
+LetA2R10£4649be one of these label matrices. Then A(:,j), i.e., jth
+column of Adescribes the label of the jth digit in the following way. If
+that digit represents digit i(0·i·9), then A(iÅ1,j)Æ Å1 and
+A(l,j)Æ ¡1 for l6ÆiÅ1.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 6 / 24
+--- PAGE 14 ---
+The USPS Handwritten Digits Dataset
+Notation
+LetXÆ[x1¢¢¢xn]2Rd£nbe the data matrix whose columns represent
+the digits in the trainingdataset with dÆ256, nÆ4649.
+LetYÆ[y1¢¢¢ym]2Rd£mbe the data matrix whose columns
+represent the digits in the testdataset with dÆ256, mÆ4649.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 7 / 24
+--- PAGE 15 ---
+The USPS Handwritten Digits Dataset
+Notation
+LetXÆ[x1¢¢¢xn]2Rd£nbe the data matrix whose columns represent
+the digits in the trainingdataset with dÆ256, nÆ4649.
+LetYÆ[y1¢¢¢ym]2Rd£mbe the data matrix whose columns
+represent the digits in the testdataset with dÆ256, mÆ4649.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 7 / 24
+--- PAGE 16 ---
+Simple Classiﬁcation Algorithms
+Outline
+1The USPS Handwritten Digits Dataset
+2Simple Classiﬁcation Algorithms
+3Classiﬁcation Using SVD Bases
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 8 / 24
+--- PAGE 17 ---
+Simple Classiﬁcation Algorithms
+The Simplest Classiﬁcation Algorithm
+The simplest classiﬁcation algorithm is perhaps the following one:
+1Compute the mean (average) digits mi,iÆ0,...,9 using the training
+digits.
+2For each digit yj, classify it as digit kifmkis the closest mean.
+Figure: The mean digits (centroids) in the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 9 / 24
+--- PAGE 18 ---
+Simple Classiﬁcation Algorithms
+The Simplest Classiﬁcation Algorithm
+The simplest classiﬁcation algorithm is perhaps the following one:
+1Compute the mean (average) digits mi,iÆ0,...,9 using the training
+digits.
+2For each digit yj, classify it as digit kifmkis the closest mean.
+Figure: The mean digits (centroids) in the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 9 / 24
+--- PAGE 19 ---
+Simple Classiﬁcation Algorithms
+The Simplest Classiﬁcation Algorithm
+The simplest classiﬁcation algorithm is perhaps the following one:
+1Compute the mean (average) digits mi,iÆ0,...,9 using the training
+digits.
+2For each digit yj, classify it as digit kifmkis the closest mean.
+Figure: The mean digits (centroids) in the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 9 / 24
+--- PAGE 20 ---
+Simple Classiﬁcation Algorithms
+The Simplest Classiﬁcation Algorithm
+The simplest classiﬁcation algorithm is perhaps the following one:
+1Compute the mean (average) digits mi,iÆ0,...,9 using the training
+digits.
+2For each digit yj, classify it as digit kifmkis the closest mean.
+Figure: The mean digits (centroids) in the training dataset.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 9 / 24
+--- PAGE 21 ---
+Simple Classiﬁcation Algorithms
+Note that there are many choices as the distance between each test
+and training digits, e.g., `p-norm with 1 ·p· 1, and cosine between
+them, etc., we decided to use the simplest one, i.e., the Euclidean, i.e.,
+`2distance: d(xi,yj)Æ kxi¡yjk2.
+The over all classiﬁcation rate was 84.66%. More precisely:0123456789
+06561341019732171
+1064401001010
+21443621325549180
+313436811703147
+431660363181540
+51333201427190166
+6231113093354010
+70510710351334
+8919512660125320
+9115013920243314
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 10 / 24
+--- PAGE 22 ---
+Simple Classiﬁcation Algorithms
+Note that there are many choices as the distance between each test
+and training digits, e.g., `p-norm with 1 ·p· 1, and cosine between
+them, etc., we decided to use the simplest one, i.e., the Euclidean, i.e.,
+`2distance: d(xi,yj)Æ kxi¡yjk2.
+The over all classiﬁcation rate was 84.66%. More precisely:
+0123456789
+06561341019732171
+1064401001010
+21443621325549180
+313436811703147
+431660363181540
+51333201427190166
+6231113093354010
+70510710351334
+8919512660125320
+9115013920243314
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 10 / 24
+--- PAGE 23 ---
+Simple Classiﬁcation Algorithms
+Figure: The worst test digits (the farthest from the means)
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 11 / 24
+--- PAGE 24 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 25 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 26 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 27 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 28 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 29 ---
+Simple Classiﬁcation Algorithms
+The Next Simplest Classiﬁcation Algorithm
+The next simplest one should be the so-called k-nearest neighbor (k-NN)
+classiﬁcation algorithm as follows:
+1Select kfrom small odd integers (i.e., 1, 3, 5, etc.)
+2For each test digit yj, do:
+Compute the distances from yjto all the training digits {xi}iÆ1,...,n.
+Choose the knearest training digits from yj.
+Check the labels of these kneighbors, and take a majority vote, which
+is assigned as a class label of yj.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 12 / 24
+--- PAGE 30 ---
+Simple Classiﬁcation Algorithms
+k-NN Classiﬁcation Results
+I tested with kÆ1,3,5 using the MATLAB function knnclassify (in
+Bioinformatics Toolbox ).
+The classiﬁcation rates were considerably better than the previous
+simplest algorithm, i.e., 96.99%, 97.07%, 96.62%, respectively. More
+precisely, for kÆ3:0123456789
+0778042010001
+1064300101011
+2314355210610
+3101402050153
+40210420031016
+54011003323122
+6311022405000
+7000010039416
+8111323123143
+9000120051390
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 13 / 24
+--- PAGE 31 ---
+Simple Classiﬁcation Algorithms
+k-NN Classiﬁcation Results
+I tested with kÆ1,3,5 using the MATLAB function knnclassify (in
+Bioinformatics Toolbox ).
+The classiﬁcation rates were considerably better than the previous
+simplest algorithm, i.e., 96.99%, 97.07%, 96.62%, respectively. More
+precisely, for kÆ3:0123456789
+0778042010001
+1064300101011
+2314355210610
+3101402050153
+40210420031016
+54011003323122
+6311022405000
+7000010039416
+8111323123143
+9000120051390
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 13 / 24
+--- PAGE 32 ---
+Simple Classiﬁcation Algorithms
+k-NN Classiﬁcation Results
+I tested with kÆ1,3,5 using the MATLAB function knnclassify (in
+Bioinformatics Toolbox ).
+The classiﬁcation rates were considerably better than the previous
+simplest algorithm, i.e., 96.99%, 97.07%, 96.62%, respectively. More
+precisely, for kÆ3:
+0123456789
+0778042010001
+1064300101011
+2314355210610
+3101402050153
+40210420031016
+54011003323122
+6311022405000
+7000010039416
+8111323123143
+9000120051390
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 13 / 24
+--- PAGE 33 ---
+Classiﬁcation Using SVD Bases
+Outline
+1The USPS Handwritten Digits Dataset
+2Simple Classiﬁcation Algorithms
+3Classiﬁcation Using SVD Bases
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 14 / 24
+--- PAGE 34 ---
+Classiﬁcation Using SVD Bases
+Classiﬁcation Using SVD Bases
+We use the ﬁrst kleft singular vectors {u1...,uk}of the SVD of the
+training digits. For each digit, we pool the training images
+corresponding to that digit, and compute the SVD. In other words, for
+each digit class, we compute the SVD.
+Since we only need the ﬁrst kterms of the SVD, we only need to use
+svdsfunction in MATLAB, which can specify kas an input argument.
+LetX(j)be a matrix of size d£njwhose columns are training images
+corresponding to digit j(hence njis the number of training images
+corresponding to digit j),jÆ0,1,...,9.
+Let the ﬁrst kterms of SVD of X(j)beU(j)
+k§(j)
+kV(j)T
+kwhere
+U(j)
+k2Rd£k,§(j)
+k2Rk£k, and V(j)
+k2Rnj£k.
+U(j)
+k§(j)
+kV(j)T
+kis the bestrank kapproximation of X(j)in the sense of
+least squares.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 15 / 24
+--- PAGE 35 ---
+Classiﬁcation Using SVD Bases
+Classiﬁcation Using SVD Bases
+We use the ﬁrst kleft singular vectors {u1...,uk}of the SVD of the
+training digits. For each digit, we pool the training images
+corresponding to that digit, and compute the SVD. In other words, for
+each digit class, we compute the SVD.
+Since we only need the ﬁrst kterms of the SVD, we only need to use
+svdsfunction in MATLAB, which can specify kas an input argument.
+LetX(j)be a matrix of size d£njwhose columns are training images
+corresponding to digit j(hence njis the number of training images
+corresponding to digit j),jÆ0,1,...,9.
+Let the ﬁrst kterms of SVD of X(j)beU(j)
+k§(j)
+kV(j)T
+kwhere
+U(j)
+k2Rd£k,§(j)
+k2Rk£k, and V(j)
+k2Rnj£k.
+U(j)
+k§(j)
+kV(j)T
+kis the bestrank kapproximation of X(j)in the sense of
+least squares.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 15 / 24
+--- PAGE 36 ---
+Classiﬁcation Using SVD Bases
+Classiﬁcation Using SVD Bases
+We use the ﬁrst kleft singular vectors {u1...,uk}of the SVD of the
+training digits. For each digit, we pool the training images
+corresponding to that digit, and compute the SVD. In other words, for
+each digit class, we compute the SVD.
+Since we only need the ﬁrst kterms of the SVD, we only need to use
+svdsfunction in MATLAB, which can specify kas an input argument.
+LetX(j)be a matrix of size d£njwhose columns are training images
+corresponding to digit j(hence njis the number of training images
+corresponding to digit j),jÆ0,1,...,9.
+Let the ﬁrst kterms of SVD of X(j)beU(j)
+k§(j)
+kV(j)T
+kwhere
+U(j)
+k2Rd£k,§(j)
+k2Rk£k, and V(j)
+k2Rnj£k.
+U(j)
+k§(j)
+kV(j)T
+kis the bestrank kapproximation of X(j)in the sense of
+least squares.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 15 / 24
+--- PAGE 37 ---
+Classiﬁcation Using SVD Bases
+Classiﬁcation Using SVD Bases
+We use the ﬁrst kleft singular vectors {u1...,uk}of the SVD of the
+training digits. For each digit, we pool the training images
+corresponding to that digit, and compute the SVD. In other words, for
+each digit class, we compute the SVD.
+Since we only need the ﬁrst kterms of the SVD, we only need to use
+svdsfunction in MATLAB, which can specify kas an input argument.
+LetX(j)be a matrix of size d£njwhose columns are training images
+corresponding to digit j(hence njis the number of training images
+corresponding to digit j),jÆ0,1,...,9.
+Let the ﬁrst kterms of SVD of X(j)beU(j)
+k§(j)
+kV(j)T
+kwhere
+U(j)
+k2Rd£k,§(j)
+k2Rk£k, and V(j)
+k2Rnj£k.
+U(j)
+k§(j)
+kV(j)T
+kis the bestrank kapproximation of X(j)in the sense of
+least squares.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 15 / 24
+--- PAGE 38 ---
+Classiﬁcation Using SVD Bases
+Classiﬁcation Using SVD Bases
+We use the ﬁrst kleft singular vectors {u1...,uk}of the SVD of the
+training digits. For each digit, we pool the training images
+corresponding to that digit, and compute the SVD. In other words, for
+each digit class, we compute the SVD.
+Since we only need the ﬁrst kterms of the SVD, we only need to use
+svdsfunction in MATLAB, which can specify kas an input argument.
+LetX(j)be a matrix of size d£njwhose columns are training images
+corresponding to digit j(hence njis the number of training images
+corresponding to digit j),jÆ0,1,...,9.
+Let the ﬁrst kterms of SVD of X(j)beU(j)
+k§(j)
+kV(j)T
+kwhere
+U(j)
+k2Rd£k,§(j)
+k2Rk£k, and V(j)
+k2Rnj£k.
+U(j)
+k§(j)
+kV(j)T
+kis the bestrank kapproximation of X(j)in the sense of
+least squares.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 15 / 24
+--- PAGE 39 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 40 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 41 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 42 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 43 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 44 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 45 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 46 ---
+Classiﬁcation Using SVD Bases
+The reasons why we use the ﬁrst kleft singular vectors are:
+Ifkisappropriately chosen, then range³
+X(j)´
+¼range³
+U(j)
+k´
+. In fact, if
+kÆmin(d,nj), then range³
+X(j)´
+Ærange³
+U(j)
+k´
+.
+The columns of U(j)
+kare a part of ONB for X(j), which allows us to
+compute the kexpansion coeﬃcients of each training image xiby
+simply multiplying (from left) U(j)T
+k, i.e., U(j)T
+kxigives you such
+expansion coeﬃcients.
+U(j)
+k³
+U(j)T
+kxi´
+is the best k-term approximation in the least squares
+sense ifxibelongs to digit jclass.
+Also, the SVD-based classiﬁcation algorithm in the next page assume
+the following (if not, it won’t work well):
+Each X(j)is well characterized and approximated by U(j)
+k§(j)
+kV(j)T
+kfor
+the same value of kfor all 10 digits.
+If you approximate X(m)using U(j)
+kwith m6Æj, the error will be large.
+If an unlabeled test digit ylhas the least k-term approximation error
+when using U(j¤)
+k, then it is likely that ylbelongs to digit j¤.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 16 / 24
+--- PAGE 47 ---
+Classiﬁcation Using SVD Bases
+An SVD Basis Classiﬁcation Algorithm
+Training: Compute the best rank kapproximation of X(j), i.e.,
+U(j)
+k§(j)
+kV(j)T
+k.
+Classiﬁcation: For a given test digit yl, compute the 2-norm of
+residual errors, Ej(yl) :Æ°°°yl¡U(j)
+k³
+U(j)T
+kyl´°°°
+2,jÆ0,1,...,9; If one of
+them, say, Ej¤(yl)is signiﬁcantly smaller than all the others, then
+classify ylas digit j¤; otherwise give up.
+Note:Mathematically, yl¡U(j)
+k³
+U(j)T
+kyl´
+Æ³
+Id¡U(j)
+kU(j)T
+k´
+yl, i.e., this is an
+orthogonal complement to the projection of ylonto range³
+U(j)
+k´
+. However,
+computationally , you should compute U(j)T
+kylﬁrst, then multiply U(j)
+k. As I
+mentioned previously, if you ﬁrst try to compute U(j)
+kU(j)T
+k, it would take a
+long time or even would be impossible to computing it if dis large. This
+digit recognition problem has dÆ256; so you can do either way.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 17 / 24
+--- PAGE 48 ---
+Classiﬁcation Using SVD Bases
+An SVD Basis Classiﬁcation Algorithm
+Training: Compute the best rank kapproximation of X(j), i.e.,
+U(j)
+k§(j)
+kV(j)T
+k.
+Classiﬁcation: For a given test digit yl, compute the 2-norm of
+residual errors, Ej(yl) :Æ°°°yl¡U(j)
+k³
+U(j)T
+kyl´°°°
+2,jÆ0,1,...,9; If one of
+them, say, Ej¤(yl)is signiﬁcantly smaller than all the others, then
+classify ylas digit j¤; otherwise give up.
+Note:Mathematically, yl¡U(j)
+k³
+U(j)T
+kyl´
+Æ³
+Id¡U(j)
+kU(j)T
+k´
+yl, i.e., this is an
+orthogonal complement to the projection of ylonto range³
+U(j)
+k´
+. However,
+computationally , you should compute U(j)T
+kylﬁrst, then multiply U(j)
+k. As I
+mentioned previously, if you ﬁrst try to compute U(j)
+kU(j)T
+k, it would take a
+long time or even would be impossible to computing it if dis large. This
+digit recognition problem has dÆ256; so you can do either way.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 17 / 24
+--- PAGE 49 ---
+Classiﬁcation Using SVD Bases
+An SVD Basis Classiﬁcation Algorithm
+Training: Compute the best rank kapproximation of X(j), i.e.,
+U(j)
+k§(j)
+kV(j)T
+k.
+Classiﬁcation: For a given test digit yl, compute the 2-norm of
+residual errors, Ej(yl) :Æ°°°yl¡U(j)
+k³
+U(j)T
+kyl´°°°
+2,jÆ0,1,...,9; If one of
+them, say, Ej¤(yl)is signiﬁcantly smaller than all the others, then
+classify ylas digit j¤; otherwise give up.
+Note:Mathematically, yl¡U(j)
+k³
+U(j)T
+kyl´
+Æ³
+Id¡U(j)
+kU(j)T
+k´
+yl, i.e., this is an
+orthogonal complement to the projection of ylonto range³
+U(j)
+k´
+. However,
+computationally , you should compute U(j)T
+kylﬁrst, then multiply U(j)
+k. As I
+mentioned previously, if you ﬁrst try to compute U(j)
+kU(j)T
+k, it would take a
+long time or even would be impossible to computing it if dis large. This
+digit recognition problem has dÆ256; so you can do either way.
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 17 / 24
+--- PAGE 50 ---
+Classiﬁcation Using SVD Bases
+U10of Digits ’0’ and ’1’
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 18 / 24
+--- PAGE 51 ---
+Classiﬁcation Using SVD Bases
+U10of Digits ’2’ and ’3’
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 19 / 24
+--- PAGE 52 ---
+Classiﬁcation Using SVD Bases
+U10of Digits ’4’ and ’5’
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 20 / 24
+--- PAGE 53 ---
+Classiﬁcation Using SVD Bases
+U10of Digits ’6’ and ’7’
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 21 / 24
+--- PAGE 54 ---
+Classiﬁcation Using SVD Bases
+U10of Digits ’8’ and ’9’
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 22 / 24
+--- PAGE 55 ---
+Classiﬁcation Using SVD Bases
+SVD Classiﬁcation Results with kÆ1:20
+Figure: kÆ17 gave the best result: 96.62%
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 23 / 24
+--- PAGE 56 ---
+Classiﬁcation Using SVD Bases
+Confusion Matrix for kÆ17
+0123456789
+0772213112130
+1064600000001
+2364316031220
+3114401070040
+4281042411501
+5200523357112
+6640023399000
+70200200387011
+8291511003093
+9050100041388
+saito@math.ucdavis.edu (UC Davis) Digit Classiﬁcation May 17, 2017 24 / 24
