@@ -1,6 +1,6 @@
 # Final Summary — Handwritten Digit Classification
 
-**Course:** MAT 167: Applied Linear Algebra — UC Davis  
+**Course:** IT256-Applied Linear Algebra — Swaroop Georgy Zachariah
 **Dataset:** USPS Handwritten Digits (9,298 images, 16×16 px)
 
 ---
